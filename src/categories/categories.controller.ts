@@ -13,7 +13,7 @@ import {
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { Observable } from 'rxjs';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { ProxyService } from 'src/proxy/proxy.service';
+import { ProxyService } from 'src/common/proxy/proxy.service';
 
 @Controller('api/v1/categories')
 export class CategoriesController {
