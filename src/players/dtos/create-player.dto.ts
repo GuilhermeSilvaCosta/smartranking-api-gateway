@@ -9,4 +9,7 @@ export class CreatePlayerDto {
 
   @IsNotEmpty()
   readonly name: string;
+
+  @IsNotEmpty()
+  readonly category: string;
 }

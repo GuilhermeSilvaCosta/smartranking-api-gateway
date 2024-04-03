@@ -14,12 +14,16 @@ import { CreateCategoryDto } from './dtos/create-category.dto';
 import { Observable } from 'rxjs';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { ProxyService } from 'src/common/proxy/proxy.service';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('api/v1/categories')
 export class CategoriesController {
   private logger = new Logger(CategoriesController.name);
+  private proxyService: ClientProxy;
 
-  constructor(private readonly proxyService: ProxyService) {}
+  constructor(proxyService: ProxyService) {
+    this.proxyService = proxyService.getClientAdmin();
+  }
 
   @Post()
   @UsePipes(ValidationPipe)

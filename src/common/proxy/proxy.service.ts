@@ -4,11 +4,11 @@ import {
   ClientProxyFactory,
   Transport,
 } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
 
 @Injectable()
 export class ProxyService {
   private clientAdmin: ClientProxy;
+  private clientChallenge: ClientProxy;
 
   constructor() {
     this.clientAdmin = ClientProxyFactory.create({
@@ -18,14 +18,21 @@ export class ProxyService {
         queue: 'admin',
       },
     });
+
+    this.clientChallenge = ClientProxyFactory.create({
+      transport: Transport.RMQ,
+      options: {
+        urls: ['amqp://guest:guest@localhost/smartranking'],
+        queue: 'challenge',
+      },
+    });
   }
 
-  emit(pattern: any, data: any): Observable<any> {
-    return this.clientAdmin.emit(pattern, data);
+  getClientAdmin(): ClientProxy {
+    return this.clientAdmin;
   }
 
-  send(pattern: any, data: any): Observable<any> {
-    console.log(pattern, data);
-    return this.clientAdmin.send(pattern, data);
+  getClientChallenge(): ClientProxy {
+    return this.clientChallenge;
   }
 }

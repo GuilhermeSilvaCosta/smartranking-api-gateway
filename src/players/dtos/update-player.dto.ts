@@ -6,4 +6,7 @@ export class UpdatePlayerDto {
 
   @IsNotEmpty()
   readonly name: string;
+
+  @IsNotEmpty()
+  readonly category: string;
 }

@@ -19,13 +19,18 @@ import { UpdatePlayerDto } from './dtos/update-player.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AwsService } from 'src/aws/aws.service';
 import { firstValueFrom } from 'rxjs';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('api/v1/players')
 export class PlayersController {
+  private proxyService: ClientProxy;
+
   constructor(
-    private readonly proxyService: ProxyService,
+    proxyService: ProxyService,
     private readonly awsService: AwsService,
-  ) {}
+  ) {
+    this.proxyService = proxyService.getClientAdmin();
+  }
 
   private readonly logger = new Logger(PlayersController.name);
 
