@@ -9,6 +9,7 @@ import {
 export class ProxyService {
   private clientAdmin: ClientProxy;
   private clientChallenge: ClientProxy;
+  private clientRanking: ClientProxy;
 
   constructor() {
     this.clientAdmin = ClientProxyFactory.create({
@@ -26,6 +27,14 @@ export class ProxyService {
         queue: 'challenge',
       },
     });
+
+    this.clientRanking = ClientProxyFactory.create({
+      transport: Transport.RMQ,
+      options: {
+        urls: ['amqp://guest:guest@localhost/smartranking'],
+        queue: 'ranking',
+      },
+    });
   }
 
   getClientAdmin(): ClientProxy {
@@ -34,5 +43,9 @@ export class ProxyService {
 
   getClientChallenge(): ClientProxy {
     return this.clientChallenge;
+  }
+
+  getClientRanking(): ClientProxy {
+    return this.clientRanking;
   }
 }

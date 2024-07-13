@@ -13,31 +13,21 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ProxyService } from 'src/common/proxy/proxy.service';
 import { CreatePlayerDto } from './dtos/create-player.dto';
 import { UpdatePlayerDto } from './dtos/update-player.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AwsService } from 'src/aws/aws.service';
-import { firstValueFrom } from 'rxjs';
-import { ClientProxy } from '@nestjs/microservices';
+import { PlayersService } from './players.service';
 
 @Controller('api/v1/players')
 export class PlayersController {
-  private proxyService: ClientProxy;
-
-  constructor(
-    proxyService: ProxyService,
-    private readonly awsService: AwsService,
-  ) {
-    this.proxyService = proxyService.getClientAdmin();
-  }
+  constructor(private readonly playersService: PlayersService) {}
 
   private readonly logger = new Logger(PlayersController.name);
 
   @Post()
   @UsePipes(ValidationPipe)
   async createOrUpdatePlayer(@Body() createPlayerDto: CreatePlayerDto) {
-    return this.proxyService.emit('create-player', createPlayerDto);
+    return this.playersService.createOrUpdatePlayer(createPlayerDto);
   }
 
   @Put('/:id')
@@ -46,41 +36,27 @@ export class PlayersController {
     @Body() updatePlayerDto: UpdatePlayerDto,
     @Param('id') id: string,
   ) {
-    return this.proxyService.send('update-player', {
-      id,
-      player: updatePlayerDto,
-    });
+    return this.playersService.updatePlayer(id, updatePlayerDto);
   }
 
   @Get()
   async searchPlayers(@Query('email') email: string) {
-    return this.proxyService.send('search-players', { email });
+    return this.playersService.searchPlayers(email);
   }
 
   @Get('/:id')
   getById(@Param('id') id: string) {
-    return this.proxyService.send('get-player', id);
+    return this.playersService.getById(id);
   }
 
   @Delete('/:id')
   async removePlayer(@Param('id') id: string): Promise<void> {
-    this.proxyService.emit('delete-player', id);
+    return this.playersService.removePlayer(id);
   }
 
   @Put('/:id/avatar')
   @UseInterceptors(FileInterceptor('file'))
   async updatePicture(@UploadedFile() file, @Param('id') id: string) {
-    const player = await firstValueFrom(
-      this.proxyService.send('get-player', id),
-    );
-    const resultUpload = await this.awsService.uploadFile(file, id);
-
-    return this.proxyService.emit('update-player', {
-      id,
-      player: {
-        ...player,
-        avatar: resultUpload.url,
-      },
-    });
+    return this.playersService.updatePicture(file, id);
   }
 }
