@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -17,6 +18,7 @@ import { CreatePlayerDto } from './dtos/create-player.dto';
 import { UpdatePlayerDto } from './dtos/update-player.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PlayersService } from './players.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('api/v1/players')
 export class PlayersController {
@@ -39,6 +41,7 @@ export class PlayersController {
     return this.playersService.updatePlayer(id, updatePlayerDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async searchPlayers(@Query('email') email: string) {
     return this.playersService.searchPlayers(email);
